@@ -1,0 +1,40 @@
+# yatr - https://github.com/cargopete/yatr
+
+[env]
+CARGO_TERM_COLOR = "always"
+
+[tasks.fmt]
+desc = "Format the tree"
+run = ["cargo fmt"]
+no_cache = true
+
+[tasks.fmt-check]
+desc = "Fail if the tree is unformatted"
+run = ["cargo fmt --check"]
+sources = ["src/**/*.rs"]
+
+[tasks.lint]
+desc = "Clippy with warnings denied"
+run = ["cargo clippy --all-targets -- -D warnings"]
+sources = ["src/**", "Cargo.toml", "Cargo.lock"]
+
+[tasks.test]
+desc = "The offline test suite"
+run = ["cargo test --locked"]
+sources = ["src/**", "Cargo.toml", "Cargo.lock"]
+watch = ["src/**"]
+
+[tasks.test-live]
+desc = "The ignored tests: staking calls against Arbitrum One's public RPC"
+run = ["cargo test --locked -- --ignored"]
+no_cache = true
+
+# Needs docker with about 4 GB for the VM, foundry and graph-cli; see "The rig" in the README.
+[tasks.rig]
+desc = "Two graph-nodes on anvil: dump, seal, restore, then compare POIs and entities"
+run = ["rig/run.sh"]
+no_cache = true
+
+[tasks.ci]
+desc = "fmt-check, lint, test"
+depends = ["fmt-check", "lint", "test"]
